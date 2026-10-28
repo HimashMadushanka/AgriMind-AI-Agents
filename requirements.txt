@@ -1,3 +1,4 @@
+# Core data science
 pandas>=2.2,<4.0
 numpy>=1.26,<3.0
 scikit-learn>=1.5,<2.0
@@ -7,17 +8,21 @@ joblib>=1.4
 jupyterlab>=4.0
 ipykernel>=6.29
 
+# Deep learning / NLP
+# For GPU training, install the PyTorch build appropriate for your device from https://pytorch.org/get-started/locally/
 torch>=2.4,<3.0
 transformers>=4.46,<5.0
 datasets>=3.0,<5.0
 accelerate>=1.0
 sentence-transformers>=3.0
 
+# Gemini, environment, weather
 google-genai>=1.0,<3.0
 python-dotenv>=1.0
 requests>=2.31
 pypdf>=5.0
 
+# Application and tests
 fastapi>=0.115
 uvicorn[standard]>=0.30
 streamlit>=1.40
