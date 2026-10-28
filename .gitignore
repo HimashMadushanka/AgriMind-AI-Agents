@@ -1,0 +1,5 @@
+# Raw datasets
+/data/raw/
+
+# Virtual environment
+.venv/
