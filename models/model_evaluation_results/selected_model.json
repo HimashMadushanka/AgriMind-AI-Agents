@@ -1,0 +1,11 @@
+{
+  "selected_model": "tfidf_linear_svc",
+  "selection_metric": "validation macro-F1; accuracy breaks ties",
+  "validation_metrics": {
+    "model": "tfidf_linear_svc",
+    "accuracy": 0.4549479166666667,
+    "precision_macro": 0.3507709599641389,
+    "recall_macro": 0.37743055555555555,
+    "f1_macro": 0.34154317448137733
+  }
+}
