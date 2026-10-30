@@ -1,36 +1,4 @@
-# Python environments, caches, and test output
-.venv/
-venv/
-env/
-__pycache__/
-*.py[cod]
-*.pyo
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
+.venv
 
-# Jupyter local state
-.ipynb_checkpoints/
-
-# Environment secrets (keep the committed template)
-.env
-.env.*
-!.env.example
-
-# Trained model artifacts and evaluation output
-models/problem_classifier/
-models/model_evaluation_results/
-!models/problem_classifier/.gitkeep
-!models/model_evaluation_results/.gitkeep
-*.joblib
-*.pt
-*.pth
-*.safetensors
-
-# Local editor and operating-system files
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
+data/raw
+data/processed
