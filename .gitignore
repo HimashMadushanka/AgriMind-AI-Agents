@@ -11,8 +11,8 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-data/raw
-data/processed
+# Local datasets (raw images, processed splits, and generated metadata)
+/data/
 
 # Trained model weights and exported model artifacts
 *.pth
@@ -24,8 +24,13 @@ data/processed
 *.ckpt
 *.safetensors
 *.pb
+*.tflite
+*.model
+*.bin
+/models/checkpoints/
+/models/exports/
 
-# Large dataset and array files
+# Large dataset, array, and database files
 *.parquet
 *.feather
 *.arrow
@@ -33,3 +38,15 @@ data/processed
 *.npz
 *.tfrecord
 *.tfrecords
+*.sqlite
+*.db
+
+# Downloaded dataset archives and generated training output
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+/outputs/
+/runs/
+/lightning_logs/

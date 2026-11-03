@@ -1,0 +1,52 @@
+﻿{
+  "bacterial_leaf_blight": {
+    "verified_information": "Bacterial leaf blight is caused by Xanthomonas oryzae pv. oryzae. In seedlings it can cause yellowing and wilting (kresek). On mature plants, water-soaked orange stripes often begin at leaf tips and move down the blade; lesions have wavy margins. Warm, humid, rainy and windy conditions and excessive nitrogen can favor disease. The Sri Lanka Department of Agriculture recommends balanced nitrogen, good drainage, and preventing drainage water from infected fields entering healthy fields. Confirm diagnosis before taking control action.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Bacterial Leaf Blight",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_bacterialleafblight/"
+  },
+  "brown_spot": {
+    "verified_information": "Brown spot is a fungal disease caused by Cochliobolus miyabeanus (Bipolaris oryzae) and can be seed-borne. It produces brown spots that range from small dark specks to oval or circular lesions with dark margins and lighter centers. It may affect seedlings, leaves, sheaths, panicles and grains; grain and panicle infection can cause economic loss. Drought, high humidity, nutrient-poor or problem soils can favor disease. Use healthy certified seed and maintain appropriate crop nutrition; seek local advice for field management.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Brown Spot",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_brownspot/"
+  },
+  "Healthy": {
+    "verified_information": "A healthy prediction means the image model did not assign the image to one of its listed disease or pest classes with the highest score. It does not prove that the plant is disease-free: early symptoms, nutrient or water stress, other pests, image quality, and diseases absent from the training classes can affect the result. Inspect the whole plant and field pattern; the Sri Lanka Department of Agriculture advises considering field history and plant and field symptoms together and consulting a trained diagnostician when uncertain.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Diagnosing a rice disease",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_diagnose/"
+  },
+  "leaf_blast": {
+    "verified_information": "Rice blast is a fungal disease caused by Magnaporthe grisea (Pyricularia grisea). Leaf blast commonly produces spindle-shaped lesions with brown margins and gray or ashy centers. The pathogen can also infect nodes and panicles; infection at the panicle base can cause neck rot and panicle breakage. High humidity, cool nights, dense planting and excessive nitrogen can favor disease. Use recommended nitrogen rates and obtain local agricultural advice if symptoms spread rapidly.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Rice Blast",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_riceblast/"
+  },
+  "leaf_scald": {
+    "verified_information": "Leaf scald is a fungal disease caused by Monographella albescens (Microdochium oryzae). Lesions often start at leaf tips or edges and show alternating tan and reddish-brown bands, sometimes with a yellow or golden leading edge. Affected leaves may dry and become straw-colored; panicle infection can discolor florets and interfere with grain development. The disease can be seed-borne. Use certified, disease-free seed and seek local advice about crop management.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Leaf Scald",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_leafscald/"
+  },
+  "narrow_brown_spot": {
+    "verified_information": "Narrow brown leaf spot is a fungal disease caused by Sphaerulina oryzina (Cercospora janseana). It forms narrow, linear light- to dark-brown lesions that run parallel to leaf veins, especially on leaves and upper sheaths. Lesions can enlarge and merge on susceptible varieties; severe disease may cause leaf necrosis, premature ripening, lodging and yield reduction. It often becomes more severe as plants approach maturity. Use clean certified seed and follow locally recommended crop nutrition and weed management.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Narrow Brown Leaf Spot",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_narrowbrownleafspot/"
+  },
+  "neck_blast": {
+    "verified_information": "Neck blast is rice blast affecting the panicle neck and is caused by Magnaporthe grisea (Pyricularia grisea). Infection at the panicle base can cause a dark, rotten neck and the panicle may fall or produce poorly filled grains. Blast risk is favored by high humidity, cool nights, dense crops and excessive nitrogen. The image model's label should be treated as a screening result; inspect the panicle and seek advice from a local agriculture officer before treatment.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Rice Blast",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_riceblast/"
+  },
+  "rice_hispa": {
+    "verified_information": "Rice hispa (Dicladispa armigera) is an insect pest, not a disease. Adults scrape the upper leaf surface, leaving pale or white streaks; larvae tunnel within leaves and produce translucent patches parallel to the veins. Severe damage can make leaves whitish, dry or scorched-looking. Confirm that the insect or characteristic feeding damage is present, since other causes can look similar. Avoid excessive fertilizer and consult local agricultural extension staff for integrated pest management advice.",
+    "source": "Lucid Central / IRRI rice pest fact sheet — Hispa",
+    "source_url": "https://keyserver.lucidcentral.org/key-server/data/0e090d01-0209-460e-810c-0d060708030c/media/Html/Hispa.htm"
+  },
+  "sheath_blight": {
+    "verified_information": "Sheath blight is a fungal disease caused by Rhizoctonia solani (Thanatephorus cucumeris). Lesions commonly begin on leaf sheaths near the waterline or soil and may enlarge into irregular lesions with pale centers and green, brown or orange bands. The disease can spread to leaf blades and panicles. Warm, humid, dense crops, shade and excessive nitrogen favor it. Use recommended nitrogen rates and seek local advice if the disease spreads.",
+    "source": "Rice Research and Development Institute, Sri Lanka Department of Agriculture — Sheath Blight",
+    "source_url": "https://doa.gov.lk/rrdi_ricediseases_sheathblight/"
+  },
+  "tungro": {
+    "verified_information": "Rice tungro is a viral disease associated with rice tungro bacilliform virus and rice tungro spherical virus and is transmitted by green leafhoppers. Infected plants may be stunted with fewer tillers; leaves can turn yellow to orange-yellow, sometimes with rusty spots or mottling, and panicles may be poorly developed with partially filled grains. Similar symptoms can have other causes, so confirm the diagnosis and check for leafhoppers with an agricultural expert before deciding on control measures.",
+    "source": "International Rice Research Institute — Diagnosis of Common Diseases of Rice (Tungro section)",
+    "source_url": "https://www.knowledgebank.irri.org/images/docs/diagnostic-of-common-diseases-of-rice.pdf"
+  }
+}
