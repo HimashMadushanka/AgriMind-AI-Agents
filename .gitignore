@@ -13,3 +13,23 @@ Thumbs.db
 
 data/raw
 data/processed
+
+# Trained model weights and exported model artifacts
+*.pth
+*.pt
+*.h5
+*.hdf5
+*.keras
+*.onnx
+*.ckpt
+*.safetensors
+*.pb
+
+# Large dataset and array files
+*.parquet
+*.feather
+*.arrow
+*.npy
+*.npz
+*.tfrecord
+*.tfrecords
