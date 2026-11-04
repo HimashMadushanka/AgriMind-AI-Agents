@@ -25,6 +25,7 @@ st.set_page_config(
 ROOT = Path(__file__).resolve().parent
 MODEL_PATH = ROOT / "models" / "rice_disease_model.pth"
 KNOWLEDGE_PATH = ROOT / "knowledge_base" / "disease_information.json"
+MAX_IMAGE_PIXELS = 40_000_000
 
 load_dotenv(ROOT / ".env")
 
@@ -342,9 +343,12 @@ with upload_col:
 
         try:
 
-            image = Image.open(
-                BytesIO(uploaded.getvalue())
-            ).convert("RGB")
+            with Image.open(BytesIO(uploaded.getvalue())) as opened_image:
+                if opened_image.width * opened_image.height > MAX_IMAGE_PIXELS:
+                    raise ValueError(
+                        f"Image exceeds the {MAX_IMAGE_PIXELS // 1_000_000}-megapixel limit."
+                    )
+                image = opened_image.convert("RGB")
 
             st.image(
                 image,
@@ -357,9 +361,14 @@ with upload_col:
                 f"Image size: {image.width} × {image.height}"
             )
 
-        except (UnidentifiedImageError, OSError):
+        except (
+            UnidentifiedImageError,
+            OSError,
+            ValueError,
+            Image.DecompressionBombError,
+        ) as error:
 
-            st.error("Invalid image file.")
+            st.error(f"Invalid or unsupported image file: {error}")
 
     image_id = (
         hashlib.sha256(uploaded.getvalue()).hexdigest()

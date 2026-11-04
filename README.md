@@ -33,9 +33,9 @@ The training cell starts a new training run each time you execute it; it saves t
 
 ```powershell
 .venv\Scripts\Activate.ps1
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 
-To enable Gemini explanations, copy `.env.example` to `.env` and set `GEMINI_API_KEY` (or configure the same key in Streamlit secrets). If Gemini is unavailable or the key is not configured, the app shows the verified local guidance instead.
+To enable Gemini explanations, copy `.env.example` to `.env` and set `GEMINI_API_KEY` (or configure the same key in Streamlit secrets). If Gemini is unavailable or the key is not configured, the app shows the verified local guidance instead. The optional `INPUT_IMAGE_PATH` setting selects a sample image for `07_create_client.ipynb`.
 
 The classifier is a screening aid. Confirm uncertain cases with a qualified agricultural officer.
