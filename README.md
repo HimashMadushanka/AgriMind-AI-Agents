@@ -1,4 +1,4 @@
-# AI Paddy Farming Intelligence
+# AgriMind
 
 An AI-assisted rice leaf screening app built for paddy farming. Upload a leaf image to receive the model’s top disease predictions and, when configured, a plain-language explanation grounded in a curated agricultural knowledge base.
 

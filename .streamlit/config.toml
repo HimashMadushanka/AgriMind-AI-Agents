@@ -1,0 +1,47 @@
+# AgriMind theme, based on the installed Streamlit Fluent theme structure.
+[theme]
+base = "light"
+font = "sans serif"
+headingFont = "sans serif"
+headingFontSizes = ["3rem", "1.75rem", "1.35rem", "1.1rem", "1rem", "0.9rem"]
+headingFontWeights = [700, 700, 650, 600, 550, 500]
+baseFontSize = 16
+baseFontWeight = 400
+metricValueFontSize = "2rem"
+metricValueFontWeight = 650
+baseRadius = "12px"
+buttonRadius = "10px"
+showWidgetBorder = true
+showSidebarBorder = true
+paddingTop = "1.5rem"
+paddingBottom = "2rem"
+
+[theme.light]
+primaryColor = "#28734A"
+backgroundColor = "#F5F8F4"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#203329"
+linkColor = "#236B45"
+borderColor = "#DCE6DD"
+chartCategoricalColors = ["#28734A", "#8AAE52", "#D0A243"]
+
+[theme.light.sidebar]
+backgroundColor = "#EDF3EC"
+secondaryBackgroundColor = "#F7FAF6"
+textColor = "#203329"
+borderColor = "#DCE6DD"
+
+[theme.dark]
+primaryColor = "#79C793"
+backgroundColor = "#111914"
+secondaryBackgroundColor = "#1A241D"
+textColor = "#E6EEE8"
+linkColor = "#9AD9AC"
+borderColor = "#34453A"
+chartCategoricalColors = ["#79C793", "#B2CC75", "#E0B765"]
+
+[theme.dark.sidebar]
+backgroundColor = "#17221A"
+secondaryBackgroundColor = "#202C23"
+textColor = "#E6EEE8"
+borderColor = "#34453A"
