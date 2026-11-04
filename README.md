@@ -1,60 +1,72 @@
+<div align="center">
+
 # AgriMind
 
-An AI-assisted rice leaf screening app built for paddy farming. Upload a leaf image to receive the model’s top disease predictions and, when configured, a plain-language explanation grounded in a curated agricultural knowledge base.
+### AI-assisted rice leaf screening for paddy farming
 
-<p align="center">
-  <a href="https://agrimind-ai-agents.streamlit.app/"><strong>🌾 Open the live app</strong></a>
-</p>
+**[Open the live dashboard](https://agrimind-ai-agents.streamlit.app/)**
 
-## What it does
+</div>
 
-- Classifies rice leaf images into 10 supported categories using EfficientNet-B0.
+![AgriMind dashboard](assets/agrimind-dashboard.png)
+
+AgriMind analyzes a rice leaf photo with an EfficientNet-B0 image classifier and returns the three most likely categories. It pairs the prediction with curated agricultural guidance, with an optional Gemini explanation.
+
+## Features
+
+- Classifies images into 10 rice disease, pest, or healthy categories.
 - Shows the top three model scores. Scores are not calibrated probabilities.
-- Provides locally available agricultural guidance for each category.
-- Optionally uses Gemini to explain that guidance in simple language. Gemini is instructed to use the supplied information and not invent pesticide names, doses, or treatments.
+- Provides local guidance with source references from the project knowledge base.
+- Offers optional Gemini explanations based on the supplied guidance.
 - Accepts JPG, JPEG, PNG, BMP, and WebP images up to 20 MB and 40 megapixels.
-
-### Supported categories
-
-Healthy, bacterial leaf blight, brown spot, leaf blast, leaf scald, narrow brown spot, neck blast, rice hispa, sheath blight, and tungro.
-
-## Try the hosted app
-
-Visit **[agrimind-ai-agents.streamlit.app](https://agrimind-ai-agents.streamlit.app/)**, upload a rice leaf image, and select **Analyze image**. The classifier works without Gemini; Gemini explanations depend on the hosted app’s secret configuration.
+- Adapts its layout for desktop and mobile screens.
 
 ## Model evaluation
 
-The evaluation artifacts included in this project report **98.41% accuracy** and **0.983 macro F1** on a held-out test split of 1,007 images. These results describe this dataset and split; they do not guarantee performance on field photographs or confirm a plant diagnosis.
+| Metric | Held-out test split |
+| --- | ---: |
+| Accuracy | 98.41% |
+| Macro F1 | 0.983 |
+| Test images | 1,007 |
+
+These results are from the project's stratified test split. They describe performance on this dataset and should not be interpreted as field-trial results.
 
 ## Run locally
 
-The project targets Python 3.13.
+Use Python 3.13. The trained checkpoint is required to run the app; the image dataset is only needed for training and evaluation.
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-Copy-Item .env.example .env
 streamlit run streamlit_app.py
 ```
 
-The app requires the trained checkpoint at `models/rice_disease_model.pth`. Model weights are excluded from Git by `.gitignore`; place the checkpoint there before launching. The image dataset is only needed to run the training and evaluation notebooks.
+Open the local URL printed by Streamlit, usually `http://localhost:8501`.
 
-### Optional Gemini explanations
+Place the trained model at:
 
-Add your own key to `.env`:
+```text
+models/rice_disease_model.pth
+```
+
+Model weights and the dataset are excluded from Git. A fresh checkout needs the model checkpoint before the app can start. To train a checkpoint, follow the notebook workflow below.
+
+## Optional Gemini explanations
+
+Copy `.env.example` to `.env` and add your Gemini key:
 
 ```dotenv
 GEMINI_API_KEY=your-api-key
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
-For Streamlit Community Cloud, add the key under **App settings → Secrets** instead of committing it. Never commit `.env`, API keys, or other credentials. If Gemini is not configured or temporarily unavailable, the app displays the verified local guidance.
+For Streamlit Community Cloud, add `GEMINI_API_KEY` under the app's **Settings → Secrets** instead. Never commit `.env` or API keys. Gemini receives the predicted category, farmer question, and curated text guidance; the image itself is not sent to Gemini. If Gemini is unavailable, the app can show the local guidance.
 
 ## Train and evaluate
 
-The raw dataset is not included. Place the image folders under `data/raw/` using these exact folder names:
+The raw dataset is not included. Place images in one folder per category under `data/raw/`:
 
 ```text
 data/raw/
@@ -72,33 +84,38 @@ data/raw/
 
 Run the notebooks in order:
 
-1. `notebook/01_create_image_dataset.ipynb` — build the image manifest.
+1. `notebook/01_create_image_dataset.ipynb` — create the image manifest.
 2. `notebook/02_validate_and_explore.ipynb` — validate images and remove exact duplicates.
 3. `notebook/03_split_dataset.ipynb` — create stratified train, validation, and test splits.
-4. `notebook/04_train_efficientnet.ipynb` — train and save the best validation checkpoint.
-5. `notebook/05_model_evaluation.ipynb` — evaluate the checkpoint on the test split.
+4. `notebook/04_train_efficientnet.ipynb` — train the classifier and save the best checkpoint.
+5. `notebook/05_model_evaluation.ipynb` — evaluate on the test split.
 6. `notebook/06_predict_image_and_llm.ipynb` — run a sample prediction and explanation.
-7. `notebook/07_create_client.ipynb` — optional standalone client workflow.
+7. `notebook/07_create_client.ipynb` — run the optional standalone client workflow.
 
-The training notebook starts a new training run when its training cell is executed. EfficientNet pretrained weights may be downloaded on the first run. To use the app, ensure the resulting checkpoint is present at `models/rice_disease_model.pth`.
+The training cell starts a new run when executed. The first run may download pretrained EfficientNet weights.
 
 ## Deploy on Streamlit Community Cloud
 
-1. Push the app code and `requirements.txt` to a GitHub repository.
-2. Ensure the deployed app has `models/rice_disease_model.pth` at the path above. The checkpoint is Git-ignored, so deployment will not receive it unless you explicitly include it or arrange a download during startup.
-3. Create a Community Cloud app from the repository and set the main file to `streamlit_app.py`.
-4. Add `GEMINI_API_KEY` in the app’s **Secrets** settings if Gemini explanations are desired.
+1. Push the app source and `requirements.txt` to GitHub.
+2. Ensure the deployment includes `models/rice_disease_model.pth`. The checkpoint is Git-ignored by default, so the app will not receive it unless you explicitly include it or configure a startup download.
+3. Create a Streamlit Community Cloud app and set the main file to `streamlit_app.py`.
+4. Add `GEMINI_API_KEY` under **Settings → Secrets** if Gemini explanations are needed.
 
 ## Project structure
 
 ```text
 streamlit_app.py                  Streamlit application
-knowledge_base/                   Curated disease and pest guidance
-models/                           Trained checkpoint and training history
-notebook/                         Data, training, evaluation, and client workflow
-requirements.txt                  Python dependencies
+assets/                            Dashboard and banner images
+knowledge_base/                    Curated disease and pest guidance
+models/                            Training history and local checkpoint
+notebook/                          Dataset, training, and evaluation workflow
+requirements.txt                   Python dependencies
 ```
 
-## Important note
+## Supported categories
 
-This app is a screening aid. A model prediction is not a confirmed diagnosis, and an image classified as healthy may still have an unrecognized problem. Check the crop and consult a qualified agricultural officer before making treatment decisions.
+Healthy, bacterial leaf blight, brown spot, leaf blast, leaf scald, narrow brown spot, neck blast, rice hispa, sheath blight, and tungro.
+
+## Important
+
+AgriMind is a screening aid, not a confirmed diagnosis. A "Healthy" prediction does not rule out other plant problems. Check the crop and consult a qualified agricultural officer before making treatment decisions.

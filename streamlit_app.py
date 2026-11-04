@@ -20,7 +20,7 @@ st.set_page_config(
     page_title="AgriMind | Rice leaf screening",
     page_icon="🌾",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
 )
 
 ROOT = Path(__file__).resolve().parent
@@ -274,14 +274,14 @@ if st.session_state.get("workspace_page") == "About AgriMind":
     st.title("About AgriMind", icon=":material/info:")
     st.caption("AI-assisted rice leaf screening for paddy farming.")
 
-    overview_cols = st.columns(3, gap="medium")
+    overview_cols = st.columns(3, gap="medium", wrap=True)
     overview_cols[0].metric("Model", "EfficientNet-B0", border=True)
     overview_cols[1].metric("Categories", "10", border=True)
     overview_cols[2].metric("Test split", "1,007 images", border=True)
 
     with st.container(border=True):
         st.subheader("Evaluation")
-        metric_cols = st.columns(2, gap="medium")
+        metric_cols = st.columns(2, gap="medium", wrap=True)
         metric_cols[0].metric("Accuracy", "98.41%")
         metric_cols[1].metric("Macro F1", "0.983")
         st.caption(
@@ -369,7 +369,11 @@ st.badge(
 
 # 10. IMAGE UPLOAD AND PREDICTION
 # st.columns wraps to a vertical layout on narrow/mobile viewports.
-upload_col, result_col = st.columns([1, 1.15], gap="large")
+upload_col, result_col = st.columns(
+    [1, 1.15],
+    gap="large",
+    wrap=True,
+)
 
 with upload_col:
     with st.container(border=True):
