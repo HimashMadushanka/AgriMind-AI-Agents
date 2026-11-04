@@ -1,20 +1,24 @@
-.venv
+# Python virtual environments
+.venv/
 venv/
 env/
+
+# Python cache and test files
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .ipynb_checkpoints/
+
+# Local secrets and environment settings
 .env
 .env.*
 !.env.example
-.DS_Store
-Thumbs.db
+/.streamlit/secrets.toml
 
-# Local datasets (raw images, processed splits, and generated metadata)
+# Local datasets (raw images, processed data, and splits)
 /data/
 
-# Trained model weights and exported model artifacts
+# Trained model weights and exported model files
 *.pth
 *.pt
 *.h5
@@ -30,7 +34,7 @@ Thumbs.db
 /models/checkpoints/
 /models/exports/
 
-# Large dataset, array, and database files
+# Large dataset and array formats
 *.parquet
 *.feather
 *.arrow
@@ -41,12 +45,19 @@ Thumbs.db
 *.sqlite
 *.db
 
-# Downloaded dataset archives and generated training output
+# Downloaded dataset archives
 *.7z
 *.tar
 *.tar.gz
 *.tgz
 *.zip
+
+# Generated evaluation and training outputs
+/evaluation/
 /outputs/
 /runs/
 /lightning_logs/
+
+# Operating system files
+.DS_Store
+Thumbs.db
