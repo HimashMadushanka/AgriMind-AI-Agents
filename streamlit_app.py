@@ -2,6 +2,7 @@
 from pathlib import Path
 from io import BytesIO
 import hashlib
+import importlib
 import json
 import os
 
@@ -13,6 +14,13 @@ from PIL import Image, UnidentifiedImageError
 from torchvision import transforms
 from torchvision.models import efficientnet_b0
 from dotenv import load_dotenv
+import localization
+
+localization = importlib.reload(localization)
+LANGUAGE_PROMPT_NAMES = localization.LANGUAGE_PROMPT_NAMES
+LANGUAGES = localization.LANGUAGES
+localized_disease_name = localization.localized_disease_name
+tr = localization.tr
 
 
 # 1. CONFIGURATION
@@ -34,12 +42,8 @@ load_dotenv(ROOT / ".env")
 
 # 2. DASHBOARD DESIGN
 # 3. DISPLAY DISEASE NAME
-def display_name(label):
-
-    if label.lower() == "healthy":
-        return "Healthy"
-
-    return label.replace("_", " ").title()
+def display_name(label, language):
+    return localized_disease_name(label, language)
 
 
 # 4. LOAD TRAINED MODEL
@@ -157,7 +161,8 @@ def explain_with_gemini(
     disease,
     verified_information,
     source,
-    question
+    question,
+    language,
 ):
 
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
@@ -175,8 +180,7 @@ def explain_with_gemini(
 
     if not api_key:
         return (
-            "Gemini is not configured. "
-            "Here is the verified agricultural guidance instead:\n\n"
+            f"{tr(language, 'fallback_unconfigured')}\n\n"
             f"{verified_information}"
         )
 
@@ -194,7 +198,9 @@ def explain_with_gemini(
     prompt = f"""
 You are an agricultural assistant for Sri Lankan rice farmers. Use everyday words, short sentences, and explain scientific terms simply.
 
-Predicted disease: {display_name(disease)}
+Respond entirely in {LANGUAGE_PROMPT_NAMES.get(language, "English")}.
+
+Predicted disease: {display_name(disease, language)}
 
 This is an image model prediction, not a confirmed diagnosis.
 
@@ -208,15 +214,10 @@ Reference source:
 {source or "Not specified"}
 
 Farmer question:
-{question or "Explain this disease in simple English."}
+{question or "Explain the symptoms and management guidance."}
 
-Give an answer using these headings:
-
-1. Predicted Disease
-2. Symptoms
-3. Management Guidance
-4. Prevention
-5. Important Note
+Use short, clear headings in the requested language. Preserve the meaning of the verified information.
+Do not add new facts, chemical names, doses, or treatment instructions.
 """
 
     try:
@@ -243,8 +244,7 @@ Give an answer using these headings:
         )
         if is_fallback_error:
             return (
-                "The AI service is temporarily unavailable. "
-                "Here is the verified agricultural guidance instead:\n\n"
+                f"{tr(language, 'fallback_unavailable')}\n\n"
                 f"{verified_information}"
             )
         raise
@@ -257,55 +257,75 @@ Give an answer using these headings:
             close_fn()
 
 
+previous_language = st.session_state.get("language_code", "en")
+language = previous_language
+
 with st.sidebar:
     st.title("AgriMind", icon=":material/grass:")
-    st.caption("Rice leaf screening")
+    st.caption(tr(language, "rice_leaf_screening"))
+    st.subheader(tr(language, "navigation"))
     st.radio(
-        "Workspace",
-        ["Leaf screening", "About AgriMind"],
-        captions=["Upload and analyze a leaf photo", "Model and evaluation details"],
+        tr(language, "navigation"),
+        ["screening", "about"],
+        format_func=lambda page: tr(
+            language, "nav_screening" if page == "screening" else "nav_about"
+        ),
+        captions=[
+            tr(language, "leaf_screening_caption"),
+            tr(language, "about_caption"),
+        ],
         key="workspace_page",
         label_visibility="collapsed",
     )
-    st.badge("10 disease and pest categories", icon=":material/category:", color="green")
+    st.space("small")
+    language = st.selectbox(
+        tr(language, "language"),
+        options=list(LANGUAGES),
+        format_func=lambda code: LANGUAGES[code],
+        key="language_code",
+    )
+    if language != previous_language:
+        st.session_state.pop("llm_answer", None)
+    st.badge(tr(language, "category_count"), icon=":material/category:", color="green")
 
-if st.session_state.get("workspace_page") == "About AgriMind":
-    st.title("About AgriMind", icon=":material/info:")
-    st.caption("AI-assisted rice leaf screening for paddy farming.")
+if st.session_state.get("workspace_page", "screening") == "about":
+    st.title(tr(language, "about_app"), icon=":material/info:")
+    st.caption(tr(language, "about_description"))
 
     overview_cols = st.columns(3, gap="medium", wrap=True)
-    overview_cols[0].metric("Model", "EfficientNet-B0", border=True)
-    overview_cols[1].metric("Categories", "10", border=True)
-    overview_cols[2].metric("Test split", "1,007 images", border=True)
+    overview_cols[0].metric(tr(language, "model"), "EfficientNet-B0", border=True)
+    overview_cols[1].metric(tr(language, "categories"), "10", border=True)
+    overview_cols[2].metric(
+        tr(language, "test_split"), tr(language, "test_images"), border=True
+    )
 
     with st.container(border=True):
-        st.subheader("Evaluation")
+        st.subheader(tr(language, "evaluation"))
         metric_cols = st.columns(2, gap="medium", wrap=True)
-        metric_cols[0].metric("Accuracy", "98.41%")
-        metric_cols[1].metric("Macro F1", "0.983")
-        st.caption(
-            "Results are from the project's held-out test split and may not "
-            "reflect performance on field photos."
-        )
+        metric_cols[0].metric(tr(language, "accuracy"), "98.41%")
+        metric_cols[1].metric(tr(language, "macro_f1"), "0.983")
+        st.caption(tr(language, "held_out_note"))
 
-    with st.expander("Supported categories"):
+    with st.expander(tr(language, "supported_categories")):
         st.write(
-            "Healthy, bacterial leaf blight, brown spot, leaf blast, leaf scald, "
-            "narrow brown spot, neck blast, rice hispa, sheath blight, and tungro."
+            ", ".join(
+                localized_disease_name(label, language)
+                for label in (
+                    "Healthy", "bacterial_leaf_blight", "brown_spot", "leaf_blast",
+                    "leaf_scald", "narrow_brown_spot", "neck_blast", "rice_hispa",
+                    "sheath_blight", "tungro",
+                )
+            )
         )
 
-    st.info(
-        "Use predictions as screening support. Confirm uncertain cases with a "
-        "qualified agricultural officer.",
-        icon=":material/health_and_safety:",
-    )
+    st.info(tr(language, "screening_warning"), icon=":material/health_and_safety:")
     st.stop()
 
 
 # 7. MAIN DASHBOARD
 with st.container(key="agrimind_brand_title"):
     st.title("AgriMind", icon=":material/eco:")
-    st.caption("AI-powered rice leaf screening")
+    st.caption(tr(language, "tagline"))
 st.html(
     """
     <style>
@@ -328,7 +348,7 @@ if HERO_IMAGE_PATH.is_file():
     with st.container(key="agrimind_hero_banner"):
         st.image(
             str(HERO_IMAGE_PATH),
-            alt="A drone surveying a green rice paddy at sunrise",
+            alt=tr(language, "hero_alt"),
             width="stretch",
         )
     st.html(
@@ -346,8 +366,8 @@ if HERO_IMAGE_PATH.is_file():
 
 # 8. CHECK TRAINED MODEL
 if not MODEL_PATH.exists():
-    st.error("Trained model not found!", icon=":material/error:")
-    st.info("Run Notebook 04_train_efficientnet.ipynb first.")
+    st.error(tr(language, "model_missing"), icon=":material/error:")
+    st.info(tr(language, "train_notebook"))
     st.stop()
 
 try:
@@ -357,11 +377,11 @@ try:
         MODEL_PATH.stat().st_size,
     )
 except Exception as error:
-    st.error(f"Model loading failed: {error}")
+    st.error(tr(language, "model_load_failed", error=error))
     st.stop()
 
 st.badge(
-    f"Model ready \u00b7 {str(device).upper()}",
+    tr(language, "model_ready", device=str(device).upper()),
     icon=":material/check_circle:",
     color="green",
 )
@@ -376,10 +396,10 @@ upload_col, result_col = st.columns(
 
 with upload_col:
     with st.container(border=True):
-        st.subheader("Upload an image", icon=":material/upload:")
-        st.caption("JPG \u00b7 PNG \u00b7 BMP \u00b7 WebP \u00b7 Max 20 MB")
+        st.subheader(tr(language, "upload"), icon=":material/upload:")
+        st.caption(tr(language, "file_types"))
         uploaded = st.file_uploader(
-            "Choose a rice leaf photo",
+            tr(language, "upload_label"),
             type=["jpg", "jpeg", "png", "bmp", "webp"],
             max_upload_size=20,
         )
@@ -390,7 +410,11 @@ with upload_col:
                 with Image.open(BytesIO(uploaded.getvalue())) as opened_image:
                     if opened_image.width * opened_image.height > MAX_IMAGE_PIXELS:
                         raise ValueError(
-                            f"Image exceeds the {MAX_IMAGE_PIXELS // 1_000_000}-megapixel limit."
+                            tr(
+                                language,
+                                "image_too_large",
+                                max=MAX_IMAGE_PIXELS // 1_000_000,
+                            )
                         )
                     image = opened_image.convert("RGB")
 
@@ -400,14 +424,16 @@ with upload_col:
                     width="stretch",
                     alt=f"Uploaded rice leaf image: {uploaded.name}",
                 )
-                st.caption(f"Image size: {image.width} x {image.height}")
+                st.caption(
+                    tr(language, "image_size", width=image.width, height=image.height)
+                )
             except (
                 UnidentifiedImageError,
                 OSError,
                 ValueError,
                 Image.DecompressionBombError,
             ) as error:
-                st.error(f"Invalid or unsupported image file: {error}")
+                st.error(tr(language, "invalid_image", error=error))
 
         image_id = (
             hashlib.sha256(uploaded.getvalue()).hexdigest()
@@ -419,14 +445,14 @@ with upload_col:
             st.session_state.pop("llm_answer", None)
 
         analyze = st.button(
-            "Analyze image",
+            tr(language, "analyze"),
             icon=":material/search:",
             type="primary",
             width="stretch",
             disabled=image is None,
         )
         if analyze and image is not None:
-            with st.spinner("Analyzing image..."):
+            with st.spinner(tr(language, "analyzing")):
                 try:
                     st.session_state["prediction"] = classify_image(
                         image,
@@ -437,45 +463,49 @@ with upload_col:
                     )
                     st.session_state.pop("llm_answer", None)
                 except Exception as error:
-                    st.error(f"Prediction failed: {error}")
+                    st.error(tr(language, "prediction_failed", error=error))
 
 with result_col:
     with st.container(border=True):
-        st.subheader("Prediction", icon=":material/analytics:")
+        st.subheader(tr(language, "prediction"), icon=":material/analytics:")
         prediction = st.session_state.get("prediction")
 
         if prediction:
             best = prediction[0]
-            st.markdown(f"## {display_name(best['label'])}")
+            st.markdown(f"## {display_name(best['label'], language)}")
             st.metric(
-                "Model score",
+                tr(language, "model_score"),
                 f"{best['score'] * 100:.2f}%",
-                help="This is not a calibrated probability or confirmed diagnosis.",
+                help=tr(language, "score_help"),
                 border=True,
             )
 
 
             chart = pd.DataFrame(
                 {
-                    "Model score (%)": [item["score"] * 100 for item in prediction]
+                    tr(language, "chart_score"): [
+                        item["score"] * 100 for item in prediction
+                    ]
                 },
-                index=[display_name(item["label"]) for item in prediction],
+                index=[
+                    display_name(item["label"], language) for item in prediction
+                ],
             )
-            st.markdown("#### Top predictions")
+            st.markdown(f"#### {tr(language, 'top_predictions')}")
             st.bar_chart(
                 chart,
-                alt="Top three predicted rice leaf categories and model scores",
+                alt=tr(language, "top_predictions"),
             )
         else:
             st.info(
-                "Upload a photo to see the prediction.",
+                tr(language, "upload_hint"),
                 icon=":material/info:",
             )
 
 
 # 10. AGRICULTURAL GUIDANCE
 if st.session_state.get("prediction"):
-    st.subheader("Guidance for this result", icon=":material/volunteer_activism:")
+    st.subheader(tr(language, "guidance"), icon=":material/volunteer_activism:")
     predicted_label = st.session_state["prediction"][0]["label"]
     knowledge = {}
 
@@ -483,29 +513,26 @@ if st.session_state.get("prediction"):
         try:
             knowledge = json.loads(KNOWLEDGE_PATH.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as error:
-            st.warning(f"Knowledge base error: {error}")
+            st.warning(tr(language, "knowledge_error", error=error))
 
     entry = knowledge.get(predicted_label, {})
     verified_information = str(entry.get("verified_information", "")).strip()
     source = str(entry.get("source", ""))
 
     if not verified_information:
-        st.warning(
-            "Add verified agricultural information to "
-            "disease_information.json before generating advice."
-        )
+        st.warning(tr(language, "guidance_missing"))
 
     with st.container(border=True):
-        st.caption("Your image is not sent to Gemini.")
+        st.caption(tr(language, "image_privacy"))
 
         with st.form("farmer_question_form"):
             question = st.text_area(
-                "Ask about this result",
-                placeholder="How can I manage this?",
+                tr(language, "ask_question"),
+                placeholder=tr(language, "question_placeholder"),
                 height=100,
             )
             generate_explanation = st.form_submit_button(
-                "Get guidance",
+                tr(language, "get_guidance"),
                 icon=":material/auto_awesome:",
                 type="primary",
                 width="stretch",
@@ -513,27 +540,30 @@ if st.session_state.get("prediction"):
             )
 
         if generate_explanation:
-            with st.spinner("Preparing guidance..."):
+            with st.spinner(tr(language, "preparing_guidance")):
                 try:
                     st.session_state["llm_answer"] = explain_with_gemini(
                         predicted_label,
                         verified_information,
                         source,
                         question,
+                        language,
                     )
                 except Exception as error:
-                    st.error(str(error))
+                    st.error(tr(language, "ai_error", error=error))
 
         if st.session_state.get("llm_answer"):
             st.markdown(st.session_state["llm_answer"])
             if source:
-                st.caption(f"Reference: {source}")
+                st.caption(tr(language, "reference", source=source))
 
             source_url = str(entry.get("source_url", "")).strip()
             if source_url:
                 st.link_button(
-                    "Open agricultural source",
+                    tr(language, "open_source"),
                     source_url,
                     icon=":material/open_in_new:",
                 )
+
+st.caption(tr(language, "footer"))
 

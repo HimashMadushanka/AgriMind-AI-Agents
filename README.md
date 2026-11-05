@@ -18,6 +18,7 @@ AgriMind analyzes a rice leaf photo with an EfficientNet-B0 image classifier and
 - Shows the top three model scores. Scores are not calibrated probabilities.
 - Provides local guidance with source references from the project knowledge base.
 - Offers optional Gemini explanations based on the supplied guidance.
+- Provides an English, Sinhala, or Tamil interface; Gemini explanations follow the selected language.
 - Accepts JPG, JPEG, PNG, BMP, and WebP images up to 20 MB and 40 megapixels.
 - Adapts its layout for desktop and mobile screens.
 
@@ -63,6 +64,8 @@ GEMINI_MODEL=gemini-2.5-flash
 ```
 
 For Streamlit Community Cloud, add `GEMINI_API_KEY` under the app's **Settings → Secrets** instead. Never commit `.env` or API keys. Gemini receives the predicted category, farmer question, and curated text guidance; the image itself is not sent to Gemini. If Gemini is unavailable, the app can show the local guidance.
+
+When Gemini is not configured, the verified local guidance is shown in English. Sinhala and Tamil explanations are AI-generated translations of the English guidance and should be confirmed with an agricultural officer if anything is unclear.
 
 ## Train and evaluate
 
