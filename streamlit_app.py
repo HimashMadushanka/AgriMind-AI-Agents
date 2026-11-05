@@ -166,7 +166,6 @@ def explain_with_gemini(
         if secret_key:
             api_key = str(secret_key).strip()
     except Exception:
-        # Local development can use .env without a secrets.toml file.
         pass
 
     model_name = os.getenv(
@@ -303,7 +302,7 @@ if st.session_state.get("workspace_page") == "About AgriMind":
     st.stop()
 
 
-# 8. MAIN DASHBOARD
+# 7. MAIN DASHBOARD
 with st.container(key="agrimind_brand_title"):
     st.title("AgriMind", icon=":material/eco:")
     st.caption("AI-powered rice leaf screening")
@@ -344,7 +343,7 @@ st.html(
 )
 
 
-# 9. CHECK TRAINED MODEL
+# 8. CHECK TRAINED MODEL
 if not MODEL_PATH.exists():
     st.error("Trained model not found!", icon=":material/error:")
     st.info("Run Notebook 04_train_efficientnet.ipynb first.")
@@ -367,8 +366,7 @@ st.badge(
 )
 
 
-# 10. IMAGE UPLOAD AND PREDICTION
-# st.columns wraps to a vertical layout on narrow/mobile viewports.
+# 9. IMAGE UPLOAD AND PREDICTION
 upload_col, result_col = st.columns(
     [1, 1.15],
     gap="large",
@@ -474,7 +472,7 @@ with result_col:
             )
 
 
-# 11. AGRICULTURAL GUIDANCE
+# 10. AGRICULTURAL GUIDANCE
 if st.session_state.get("prediction"):
     st.subheader("Guidance for this result", icon=":material/volunteer_activism:")
     predicted_label = st.session_state["prediction"][0]["label"]
@@ -539,6 +537,6 @@ if st.session_state.get("prediction"):
                 )
 
 
-# 12. FOOTER
+# 11. FOOTER
 st.space("small")
 st.caption("Decision support only \u00b7 Confirm uncertain cases with an agriculture officer.")
