@@ -537,7 +537,3 @@ if st.session_state.get("prediction"):
                     icon=":material/open_in_new:",
                 )
 
-
-# 11. FOOTER
-st.space("small")
-st.caption("Decision support only \u00b7 Confirm uncertain cases with an agriculture officer.")
