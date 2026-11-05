@@ -459,13 +459,21 @@ with upload_col:
             st.session_state["image_id"] = image_id
             st.session_state.pop("prediction", None)
             st.session_state.pop("llm_answer", None)
+            st.session_state["confirm_rice_leaf"] = False
+
+        rice_leaf_confirmed = st.checkbox(
+            tr(language, "confirm_leaf"),
+            key="confirm_rice_leaf",
+            disabled=image is None,
+        )
+        st.caption(tr(language, "image_type_limit"))
 
         analyze = st.button(
             tr(language, "analyze"),
             icon=":material/search:",
             type="primary",
             width="stretch",
-            disabled=image is None,
+            disabled=image is None or not rice_leaf_confirmed,
         )
         if analyze and image is not None:
             with st.spinner(tr(language, "analyzing")):
