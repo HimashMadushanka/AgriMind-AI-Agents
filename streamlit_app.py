@@ -36,6 +36,9 @@ MODEL_PATH = ROOT / "models" / "rice_disease_model.pth"
 KNOWLEDGE_PATH = ROOT / "knowledge_base" / "disease_information.json"
 HERO_IMAGE_PATH = ROOT / "assets" / "agrimind-rice-field.png"
 MAX_IMAGE_PIXELS = 40_000_000
+# Preliminary review thresholds; validate these with expert-labeled field images.
+MIN_PREDICTION_SCORE = 0.65
+MIN_TOP_TWO_MARGIN = 0.10
 
 load_dotenv(ROOT / ".env")
 
@@ -154,6 +157,19 @@ def classify_image(
         })
 
     return results
+
+
+def prediction_needs_review(prediction):
+    """Flag weak or ambiguous scores; these are not calibrated probabilities."""
+    if not prediction:
+        return False
+
+    top_score = prediction[0]["score"]
+    second_score = prediction[1]["score"] if len(prediction) > 1 else 0.0
+    return (
+        top_score < MIN_PREDICTION_SCORE
+        or top_score - second_score < MIN_TOP_TWO_MARGIN
+    )
 
 
 # 6. GEMINI EXPLANATION
@@ -472,30 +488,37 @@ with result_col:
 
         if prediction:
             best = prediction[0]
-            st.markdown(f"## {display_name(best['label'], language)}")
-            st.metric(
-                tr(language, "model_score"),
-                f"{best['score'] * 100:.2f}%",
-                help=tr(language, "score_help"),
-                border=True,
-            )
+            needs_review = prediction_needs_review(prediction)
+            if needs_review:
+                st.error(
+                    tr(language, "invalid_leaf_image"),
+                    icon=":material/image_not_supported:",
+                )
+                st.caption(tr(language, "uncertainty_note"))
+            else:
+                st.markdown(f"## {display_name(best['label'], language)}")
+                st.metric(
+                    tr(language, "model_score"),
+                    f"{best['score'] * 100:.2f}%",
+                    help=tr(language, "score_help"),
+                    border=True,
+                )
 
-
-            chart = pd.DataFrame(
-                {
-                    tr(language, "chart_score"): [
-                        item["score"] * 100 for item in prediction
-                    ]
-                },
-                index=[
-                    display_name(item["label"], language) for item in prediction
-                ],
-            )
-            st.markdown(f"#### {tr(language, 'top_predictions')}")
-            st.bar_chart(
-                chart,
-                alt=tr(language, "top_predictions"),
-            )
+                chart = pd.DataFrame(
+                    {
+                        tr(language, "chart_score"): [
+                            item["score"] * 100 for item in prediction
+                        ]
+                    },
+                    index=[
+                        display_name(item["label"], language) for item in prediction
+                    ],
+                )
+                st.markdown(f"#### {tr(language, 'top_predictions')}")
+                st.bar_chart(
+                    chart,
+                    alt=tr(language, "top_predictions"),
+                )
         else:
             st.info(
                 tr(language, "upload_hint"),
@@ -505,65 +528,69 @@ with result_col:
 
 # 10. AGRICULTURAL GUIDANCE
 if st.session_state.get("prediction"):
-    st.subheader(tr(language, "guidance"), icon=":material/volunteer_activism:")
-    predicted_label = st.session_state["prediction"][0]["label"]
-    knowledge = {}
+    prediction = st.session_state["prediction"]
+    if prediction_needs_review(prediction):
+        st.warning(tr(language, "uncertain_guidance"), icon=":material/health_and_safety:")
+    else:
+        st.subheader(tr(language, "guidance"), icon=":material/volunteer_activism:")
+        predicted_label = prediction[0]["label"]
+        knowledge = {}
 
-    if KNOWLEDGE_PATH.exists():
-        try:
-            knowledge = json.loads(KNOWLEDGE_PATH.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as error:
-            st.warning(tr(language, "knowledge_error", error=error))
+        if KNOWLEDGE_PATH.exists():
+            try:
+                knowledge = json.loads(KNOWLEDGE_PATH.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as error:
+                st.warning(tr(language, "knowledge_error", error=error))
 
-    entry = knowledge.get(predicted_label, {})
-    verified_information = str(entry.get("verified_information", "")).strip()
-    source = str(entry.get("source", ""))
+        entry = knowledge.get(predicted_label, {})
+        verified_information = str(entry.get("verified_information", "")).strip()
+        source = str(entry.get("source", ""))
 
-    if not verified_information:
-        st.warning(tr(language, "guidance_missing"))
+        if not verified_information:
+            st.warning(tr(language, "guidance_missing"))
 
-    with st.container(border=True):
-        st.caption(tr(language, "image_privacy"))
+        with st.container(border=True):
+            st.caption(tr(language, "image_privacy"))
 
-        with st.form("farmer_question_form"):
-            question = st.text_area(
-                tr(language, "ask_question"),
-                placeholder=tr(language, "question_placeholder"),
-                height=100,
-            )
-            generate_explanation = st.form_submit_button(
-                tr(language, "get_guidance"),
-                icon=":material/auto_awesome:",
-                type="primary",
-                width="stretch",
-                disabled=not bool(verified_information),
-            )
-
-        if generate_explanation:
-            with st.spinner(tr(language, "preparing_guidance")):
-                try:
-                    st.session_state["llm_answer"] = explain_with_gemini(
-                        predicted_label,
-                        verified_information,
-                        source,
-                        question,
-                        language,
-                    )
-                except Exception as error:
-                    st.error(tr(language, "ai_error", error=error))
-
-        if st.session_state.get("llm_answer"):
-            st.markdown(st.session_state["llm_answer"])
-            if source:
-                st.caption(tr(language, "reference", source=source))
-
-            source_url = str(entry.get("source_url", "")).strip()
-            if source_url:
-                st.link_button(
-                    tr(language, "open_source"),
-                    source_url,
-                    icon=":material/open_in_new:",
+            with st.form("farmer_question_form"):
+                question = st.text_area(
+                    tr(language, "ask_question"),
+                    placeholder=tr(language, "question_placeholder"),
+                    height=100,
                 )
+                generate_explanation = st.form_submit_button(
+                    tr(language, "get_guidance"),
+                    icon=":material/auto_awesome:",
+                    type="primary",
+                    width="stretch",
+                    disabled=not bool(verified_information),
+                )
+
+            if generate_explanation:
+                with st.spinner(tr(language, "preparing_guidance")):
+                    try:
+                        st.session_state["llm_answer"] = explain_with_gemini(
+                            predicted_label,
+                            verified_information,
+                            source,
+                            question,
+                            language,
+                        )
+                    except Exception as error:
+                        st.error(tr(language, "ai_error", error=error))
+
+            if st.session_state.get("llm_answer"):
+                st.markdown(st.session_state["llm_answer"])
+                if source:
+                    st.caption(tr(language, "reference", source=source))
+
+                source_url = str(entry.get("source_url", "")).strip()
+                if source_url:
+                    st.link_button(
+                        tr(language, "open_source"),
+                        source_url,
+                        icon=":material/open_in_new:",
+                    )
 
 st.caption(tr(language, "footer"))
 
