@@ -324,23 +324,24 @@ st.html(
     </style>
     """
 )
-with st.container(key="agrimind_hero_banner"):
-    st.image(
-        str(HERO_IMAGE_PATH),
-        alt="A drone surveying a green rice paddy at sunrise",
-        width="stretch",
+if HERO_IMAGE_PATH.is_file():
+    with st.container(key="agrimind_hero_banner"):
+        st.image(
+            str(HERO_IMAGE_PATH),
+            alt="A drone surveying a green rice paddy at sunrise",
+            width="stretch",
+        )
+    st.html(
+        """
+        <style>
+        .st-key-agrimind_hero_banner img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        </style>
+        """
     )
-st.html(
-    """
-    <style>
-    .st-key-agrimind_hero_banner img {
-        height: 220px;
-        width: 100%;
-        object-fit: cover;
-    }
-    </style>
-    """
-)
 
 
 # 8. CHECK TRAINED MODEL
