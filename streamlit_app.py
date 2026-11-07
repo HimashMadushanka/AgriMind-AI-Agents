@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 import torch
 import torch.nn as nn
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from torchvision import transforms
 from torchvision.models import efficientnet_b0
 from dotenv import load_dotenv
@@ -433,7 +433,7 @@ with upload_col:
                                 max=MAX_IMAGE_PIXELS // 1_000_000,
                             )
                         )
-                    image = opened_image.convert("RGB")
+                    image = ImageOps.exif_transpose(opened_image).convert("RGB")
 
                 st.image(
                     image,
@@ -467,6 +467,9 @@ with upload_col:
             key="confirm_rice_leaf",
             disabled=image is None,
         )
+        if not rice_leaf_confirmed:
+            st.session_state.pop("prediction", None)
+            st.session_state.pop("llm_answer", None)
         st.caption(tr(language, "image_type_limit"))
 
         analyze = st.button(
@@ -479,6 +482,7 @@ with upload_col:
         if analyze and image is not None:
             with st.spinner(tr(language, "analyzing")):
                 try:
+                    st.session_state.pop("prediction", None)
                     st.session_state["prediction"] = classify_image(
                         image,
                         model,

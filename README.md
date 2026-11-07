@@ -53,7 +53,7 @@ Place the trained model at:
 models/rice_disease_model.pth
 ```
 
-Model weights and the dataset are excluded from Git. A fresh checkout needs the model checkpoint before the app can start. To train a checkpoint, follow the notebook workflow below.
+The current repository includes `models/rice_disease_model.pth`, so a checkout can run the app with the supplied checkpoint. The `.gitignore` rule prevents new model files from being added by default; if you replace the checkpoint, confirm that your deployment includes the intended file. The dataset is excluded from Git and is needed only for training and evaluation.
 
 ## Optional Gemini explanations
 
@@ -96,12 +96,12 @@ Run the notebooks in order:
 6. `notebook/06_predict_image_and_llm.ipynb` — run a sample prediction and explanation.
 7. `notebook/07_create_client.ipynb` — run the optional standalone client workflow.
 
-The training cell starts a new run when executed. The first run may download pretrained EfficientNet weights.
+The training cell starts a new run when executed. The first run may download pretrained EfficientNet weights. Exact duplicate images are removed before the random split; near-duplicates or photos of the same plant may still appear across splits and inflate held-out scores. For a stronger field-performance estimate, split by plant, session, or source before training.
 
 ## Deploy on Streamlit Community Cloud
 
 1. Push the app source and `requirements.txt` to GitHub.
-2. Ensure the deployment includes `models/rice_disease_model.pth`. The checkpoint is Git-ignored by default, so the app will not receive it unless you explicitly include it or configure a startup download.
+2. Ensure the deployment includes `models/rice_disease_model.pth`. The current checkpoint is already tracked in this repository. If you create a fresh checkpoint, remember `.gitignore` excludes new model files by default; deliberately add or otherwise provide the replacement for deployment.
 3. Create a Streamlit Community Cloud app and set the main file to `streamlit_app.py`.
 4. Add `GEMINI_API_KEY` under **Settings → Secrets** if Gemini explanations are needed.
 
