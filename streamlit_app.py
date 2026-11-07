@@ -608,5 +608,4 @@ if st.session_state.get("prediction"):
                         icon=":material/open_in_new:",
                     )
 
-st.caption(tr(language, "footer"))
 
