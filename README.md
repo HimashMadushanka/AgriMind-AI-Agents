@@ -106,16 +106,6 @@ The training cell starts a new run when executed. The first run may download pre
 3. Create a Streamlit Community Cloud app and set the main file to `streamlit_app.py`.
 4. Add `GEMINI_API_KEY` under **Settings → Secrets** if Gemini explanations are needed.
 
-## Project structure
-
-```text
-streamlit_app.py                  Streamlit application
-assets/                            Dashboard and banner images
-knowledge_base/                    Curated disease and pest guidance
-models/                            Training history and local checkpoint
-notebook/                          Dataset, training, and evaluation workflow
-requirements.txt                   Python dependencies
-```
 
 ## Supported categories
 
