@@ -36,9 +36,10 @@ MODEL_PATH = ROOT / "models" / "rice_disease_model.pth"
 KNOWLEDGE_PATH = ROOT / "knowledge_base" / "disease_information.json"
 HERO_IMAGE_PATH = ROOT / "assets" / "agrimind-rice-field.png"
 MAX_IMAGE_PIXELS = 40_000_000
-# Preliminary review thresholds; validate these with expert-labeled field images.
-MIN_PREDICTION_SCORE = 0.65
-MIN_TOP_TWO_MARGIN = 0.10
+# Conservative preliminary review thresholds. They reduce false confident
+# outputs, but cannot reliably identify every image outside the rice dataset.
+MIN_PREDICTION_SCORE = 0.80
+MIN_TOP_TWO_MARGIN = 0.15
 
 load_dotenv(ROOT / ".env")
 

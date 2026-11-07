@@ -59,7 +59,7 @@ TEXT = {
         "uncertain_result": "Uncertain result. Try a clear, close-up leaf photo in good lighting.",
         "invalid_leaf_image": "The photo could not be classified reliably. It may not be a rice leaf, or it may be unclear. Upload a sharp, close-up rice-leaf photo.",
         "uncertain_guidance": "Disease-specific guidance is hidden because this result may be unreliable. Retake the photo or ask an agriculture officer.",
-        "uncertainty_note": "This review check uses preliminary model-score thresholds and has not been validated on field photos.",
+        "uncertainty_note": "This check uses conservative preliminary score thresholds. It may flag valid rice-leaf photos, and it cannot catch every non-rice image. Confirm results with an agriculture officer.",
         "top_predictions": "Top predictions",
         "chart_score": "Model score (%)",
         "upload_hint": "Upload a photo to see the prediction.",

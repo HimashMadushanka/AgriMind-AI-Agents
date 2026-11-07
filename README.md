@@ -16,6 +16,7 @@ AgriMind analyzes a rice leaf photo with an EfficientNet-B0 image classifier and
 
 - Classifies images into 10 rice disease, pest, or healthy categories.
 - Shows the top three model scores. Scores are not calibrated probabilities.
+- Uses conservative score and ambiguity checks to warn on uncertain predictions and hide disease guidance. These checks can still miss non-rice images; only upload paddy-leaf photos.
 - Provides local guidance with source references from the project knowledge base.
 - Offers optional Gemini explanations based on the supplied guidance.
 - Provides an English, Sinhala, or Tamil interface; Gemini explanations follow the selected language.
